@@ -12,7 +12,7 @@ function preparedArt(art,theme){
  const tone=theme.slice(1);
  art=art.replace(/filter="url\(#(holeThreshold|paperSurfaceThreshold)\)" href="assets\/tear.png"/g,(_,id)=>`href="assets/mobile/${id}.webp"`);
  art=art.replaceAll('assets/paper.png','assets/mobile/paperGrain.webp');
- art=art.replace(/assets\/(creature-atlas-r01|eye-cels-r01|hand-cels-r01|tear|bat-panel-[^" ]+)\.png/g,(_,name)=>`assets/mobile/${name}-${tone}.webp`);
+ art=art.replace(/assets\/(creature-atlas-r01|eye-cels-r01|hand-cels-r01|hand-cels-slim-r01|tear|bat-panel-[^" ]+)\.png/g,(_,name)=>`assets/mobile/${name}-${tone}.webp`);
  art=art.replace(/assets\/(?!mobile\/)([^" ]+)\.png/g,'assets/mobile/$1.webp');
  art=art.replace(/ filter="url\(#(?:marker|batTone|tearTone|paperGrain|boilEye|boilHand|boilBat)\)"/g,'');
  return art.replace(/<filter id="(?:marker|batTone|tearTone|paperGrain|boilEye|boilHand|boilBat|holeThreshold|paperSurfaceThreshold)"[\s\S]*?<\/filter>/g,'');

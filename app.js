@@ -29,7 +29,7 @@ presentScene(preparedArt(art,interaction.theme),mode==='idle');notePresented();s
 function tick(now){requestAnimationFrame(tick);if(document.hidden)return;const interval=mode==='playing'?40:16;if(now-last<interval)return;last=now-((now-last)%interval);const started=performance.now();render(now);noteFrame(now,performance.now()-started)}
 // Warm only the selected palette; keep decoded images for quick repeat interactions.
 render(performance.now());
-const warmFiles=['creature-atlas-r01','eye-cels-r01','hand-cels-r01','tear','bat-panel-0--1','bat-panel-0-0','bat-panel-0-1','bat-panel-1--1','bat-panel-1-0','bat-panel-1-1'];
+const warmFiles=['creature-atlas-r01','eye-cels-r01','hand-cels-r01','hand-cels-slim-r01','tear','bat-panel-0--1','bat-panel-0-0','bat-panel-0-1','bat-panel-1--1','bat-panel-1-0','bat-panel-1-1'];
 const warmImages=new Map();
 function warmImage(file){
  if(warmImages.has(file))return warmImages.get(file).promise;

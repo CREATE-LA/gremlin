@@ -2,6 +2,7 @@ const W=1080,H=1920,FPS=25,DURATION=6.4,CONTRAST=1.8;
 const SPRITE="assets/creature-atlas-r01.png";
 const CELS="assets/eye-cels-r01.png";
 const HANDCELS="assets/hand-cels-r01.png";
+const SLIMHANDCELS="assets/hand-cels-slim-r01.png";
 const BATATLAS="assets/bat-cels-r01.png";
 const TEAR="assets/tear.png";
 const PAPER="assets/paper.png";
@@ -110,7 +111,7 @@ function insideHands(side,s,t){
  const edge=940+750*q*(e-.5)+(left?1:-1)*190*retreat;
  const rotate=left?180:0,box=HANDBOX[(left?0:3)+pose];
  const opacity=appear*(1-ramp(release,.26,.36,'soft'));
- const hand=`<g opacity="${f(opacity)}" transform="translate(0 ${f(edge-LY)}) rotate(${rotate} ${center} ${LY})"><g filter="url(#boilHand)"><g filter="url(#thinHands)"><g filter="url(#marker)"><svg x="${f(center-hw/2)}" y="${f(hy)}" width="${f(hw)}" height="${f(hh)}" viewBox="${box.join(' ')}" preserveAspectRatio="none" overflow="hidden"><image href="${HANDCELS}" width="1536" height="1024"/></svg></g></g></g></g>`;
+ const hand=`<g opacity="${f(opacity)}" transform="translate(0 ${f(edge-LY)}) rotate(${rotate} ${center} ${LY})"><g filter="url(#boilHand)"><g filter="url(#marker)"><svg x="${f(center-hw/2)}" y="${f(hy)}" width="${f(hw)}" height="${f(hh)}" viewBox="${box.join(' ')}" preserveAspectRatio="none" overflow="hidden"><image href="${SLIMHANDCELS}" width="1536" height="1024"/></svg></g></g></g>`;
  // Original finger cel spans actual paper boundary; no wrist/forearm drawing.
  return release>=.12?{behind:`<g mask="url(#eyeInside)">${hand}</g>`,front:''}:{behind:'',front:hand};
 }
@@ -248,7 +249,6 @@ function svg(inputTime){
  <mask id="inkTear" maskUnits="userSpaceOnUse" x="0" y="0" width="1080" height="1920"><rect width="1080" height="1920" fill="black"/><image filter="url(#paperSurfaceThreshold)" href="${TEAR}" x="${f(tearX)}" y="${f(tearY)}" width="${f(tearW)}" height="${f(tearH)}" preserveAspectRatio="none"/></mask><mask id="paperSurface" maskUnits="userSpaceOnUse" x="0" y="0" width="1080" height="1920"><rect width="1080" height="1920" fill="white"/><image filter="url(#paperSurfaceThreshold)" href="${TEAR}" x="${f(tearX)}" y="${f(tearY)}" width="${f(tearW)}" height="${f(tearH)}" preserveAspectRatio="none"/></mask>
  <filter id="thinEyes" x="-5%" y="-5%" width="110%" height="110%"><feMorphology in="SourceAlpha" operator="erode" radius="3.2" result="thin"/><feComposite in="SourceGraphic" in2="thin" operator="in"/></filter>
  <filter id="boilEye" x="-12%" y="-12%" width="124%" height="124%" color-interpolation-filters="sRGB"><feTurbulence type="fractalNoise" baseFrequency=".022 .018" numOctaves="2" seed="${[3,11,7,19][phase]}" result="noise"/><feDisplacementMap in="SourceGraphic" in2="noise" scale="15" xChannelSelector="R" yChannelSelector="G"/></filter>
- <filter id="thinHands" x="-8%" y="-8%" width="116%" height="116%"><feGaussianBlur in="SourceAlpha" stdDeviation=".65" result="smoothHand"/><feComponentTransfer in="smoothHand" result="solidHand"><feFuncA type="linear" slope="5" intercept="-.6"/></feComponentTransfer><feMorphology in="solidHand" operator="erode" radius="3.5" result="slim"/><feComposite in="SourceGraphic" in2="slim" operator="in"/></filter>
  <filter id="boilHand" x="-15%" y="-15%" width="130%" height="130%" color-interpolation-filters="sRGB"><feTurbulence type="fractalNoise" baseFrequency=".04 .035" numOctaves="1" seed="${[7,19,3,11][phase]}" result="noise"/><feDisplacementMap in="SourceGraphic" in2="noise" scale="16" xChannelSelector="R" yChannelSelector="G"/></filter>
  <filter id="boilBat" filterUnits="userSpaceOnUse" x="0" y="0" width="1080" height="1920" color-interpolation-filters="sRGB"><feTurbulence type="fractalNoise" baseFrequency=".025 .019" numOctaves="1" seed="${[11,3,19,7][phase]}" result="noise"/><feDisplacementMap in="SourceGraphic" in2="noise" scale="12" xChannelSelector="R" yChannelSelector="G"/></filter>
  <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%"><feColorMatrix values="0 0 0 0 .165 0 0 0 0 .165 0 0 0 0 .165 0 0 0 1 0"/><feGaussianBlur stdDeviation="2.2"/></filter>
