@@ -259,7 +259,7 @@ function svg(inputTime){
  const visiblePeek=Math.min(1,s.peek/80);
  const eyPeek=704+80*(1-visiblePeek);
  const ey=805+32*(1-ramp(t,3.60,3.92,'soft'))+270*ramp(t,5.36,5.56,'fast');
- const hands=interaction.idleExpression?[]:['left','right'].map(side=>handLayers(side,s,t));
+ const hands=interaction.idleExpression?[]:['left','right'].map(side=>{const h=handLayers(side,s,t);return interaction.reward==='surprise'?surpriseHands(h,side):h});
  if(q>.002){
    const tw=1030*(.72+.28*ramp(t,3.44,3.72,'fast')),th=750*q;
    out+=`<image filter="url(#tearTone)" href="${TEAR}" x="${f((1080-tw)/2)}" y="${f(940-th/2)}" width="${f(tw)}" height="${f(th)}" preserveAspectRatio="none"/>`;

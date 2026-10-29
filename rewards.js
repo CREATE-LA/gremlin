@@ -1,5 +1,5 @@
 // Bats retain the original film choreography. Other modes have their own physics.
-function rewardEnd(mode){return mode==='bats'?8.64:mode==='surprise'?12.5:9.8;}
+function rewardEnd(mode){return mode==='bats'?8.68:mode==='surprise'?14.0:9.8;}
 function rewardFilmTime(t,mode){if(mode==='surprise')return surpriseFilmTime(t);return mode==='bats'||t<=4.25?t:Math.min(6.4,4.25+(t-4.25)*.48);}
 function ghostShape(){return `<path d="M-43 43 Q-56 5 -36 -31 Q-17 -61 13 -53 Q49 -45 46 -5 Q44 19 61 39 Q40 33 29 46 Q12 32 -3 47 Q-20 34 -43 43Z" fill="#2A2A2A" stroke="#EDFF00" stroke-width="4" stroke-linejoin="round"/><ellipse cx="-12" cy="-14" rx="5" ry="10" fill="#EDFF00"/><ellipse cx="16" cy="-17" rx="5" ry="10" fill="#EDFF00"/><ellipse cx="6" cy="13" rx="8" ry="12" fill="#EDFF00"/>`;}
 function ballPose(age,i){
