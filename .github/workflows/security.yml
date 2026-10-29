@@ -16,3 +16,4 @@ jobs:
         with:
           persist-credentials: false
       - run: python3 .github/scripts/check-security.py
+      - run: node .github/scripts/check-sound.cjs
