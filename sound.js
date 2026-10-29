@@ -32,6 +32,6 @@ soundButton.onclick=()=>{
  soundButton.setAttribute('aria-pressed',String(storySound));
  soundButton.setAttribute('aria-label',storySound?'Turn sound off':'Turn sound on');
  soundButton.style.opacity=storySound?'1':'.45';
- if(storySound&&mode==='playing')startStorySound(time);else stopStorySound();
+ if(storySound&&mode==='playing')startStorySound(playFrom+(performance.now()-phaseAt)/1000);else stopStorySound();
 };
 soundButton.style.opacity='.45';
