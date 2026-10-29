@@ -33,6 +33,6 @@ allowed = {'.nojekyll', '.gitignore', 'SECURITY.md', 'index.html', 'bootstrap.js
 files = subprocess.check_output(['git', '-C', str(root), 'ls-files'], text=True).splitlines()
 for name in files:
     p = Path(name)
-    assert name in allowed or (name.startswith('assets/') and p.suffix in {'.png', '.webp', '.mp3'}) or name.startswith('.github/'), name
+    assert name in allowed or (name.startswith('assets/') and p.suffix in {'.png', '.webp', '.mp3', '.m4a'}) or name.startswith('.github/'), name
     assert not p.name.startswith('.env') and p.suffix not in {'.pem', '.key', '.p12', '.pfx'}, name
 print(f'Static security boundary passed: {len(page.scripts)} local scripts, restrictive CSP, no inline handlers/forms, {len(files)} tracked paths checked.')
