@@ -13,14 +13,18 @@ button:focus-visible,select:focus-visible{outline:2px solid var(--ink);outline-o
 .hint{position:absolute;z-index:2;top:calc(50% + min(6vw,6vh) + 14px);left:50%;width:max-content;max-width:90%;transform:translateX(-50%);text-align:center;font-size:12px;letter-spacing:.02em;pointer-events:none;opacity:1;transition:opacity .45s ease-out}
 .hint svg{display:block;width:30px;height:27px;margin:0 auto 8px;overflow:visible}
 .hint.is-dismissed{opacity:0}
-.bar{--control-height:40px;position:fixed;z-index:3;left:0;right:0;bottom:0;display:flex;gap:10px;align-items:center;justify-content:center;padding:16px 16px calc(16px + env(safe-area-inset-bottom,0px))}.bar button{position:relative;height:var(--control-height);min-height:var(--control-height);font:13px ui-monospace,SFMono-Regular,Menlo,Consolas,'Courier New',monospace;padding:0 14px;border-radius:999px;border:1px solid var(--ink);background:var(--ink);color:var(--btn-fg);cursor:pointer;backdrop-filter:none;white-space:nowrap}.bar button.sw{width:var(--control-height);height:var(--control-height);flex-shrink:0;padding:0;border-radius:50%;border:1px solid var(--ink);backdrop-filter:none}.bar button.sw[aria-pressed=true]{box-shadow:inset 0 0 0 3px var(--bg),inset 0 0 0 4px var(--ink)}.bar button:not(.sw):hover{background:var(--hov);border-color:var(--hov);color:var(--btn-fg)}
+.bar{position:fixed;z-index:3;left:0;right:0;bottom:0;display:flex;gap:10px;align-items:center;justify-content:center;padding:16px 16px calc(16px + env(safe-area-inset-bottom,0px))}
+.bar button{position:relative;font:13px ui-monospace,SFMono-Regular,Menlo,Consolas,'Courier New',monospace;padding:9px 14px;border-radius:999px;border:1px solid var(--ink);background:var(--ink);color:var(--btn-fg);cursor:pointer;backdrop-filter:none;white-space:nowrap}
+.bar button.sw{width:30px;height:30px;flex-shrink:0;padding:0;border-radius:50%;border:1px solid var(--ink);backdrop-filter:none}
+.bar button.sw[aria-pressed=true]{box-shadow:0 0 0 3px var(--bg),0 0 0 4px var(--ink)}
+.bar button:not(.sw):hover{background:var(--hov);border-color:var(--hov);color:var(--btn-fg)}
 #sound{position:fixed;right:12px;top:calc(6px + env(safe-area-inset-top,0px));width:44px;height:44px;border:0;background:transparent;color:var(--ink);font-size:20px;z-index:4;cursor:pointer}
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}
 @media(min-width:601px){.hint{font-size:13px}}
 @media(orientation:landscape){#pull{left:25%;width:50%;top:33%;height:34%}}
 @media(prefers-reduced-motion:reduce){*{transition:none!important}}
-@media(max-width:600px){.bar{gap:7px;padding-left:8px;padding-right:8px}.bar button:not(.sw){font-size:10.5px;padding:0 10px}}
-@media(pointer:coarse){.bar button:after{content:"";position:absolute;left:0;right:0;top:calc((var(--control-height) - 44px)/2);bottom:calc((var(--control-height) - 44px)/2)}}@media(max-width:360px){.bar{--control-height:32px;gap:4px;padding-left:10px;padding-right:10px}.bar button:not(.sw){padding-left:8px;padding-right:8px;font-size:10px}}
+@media(max-width:600px){.bar{gap:7px}.bar button:not(.sw){font-size:10.5px;padding:7px 10px}.bar button.sw{width:26px;height:26px}}
+@media(pointer:coarse){.bar button:after{content:"";position:absolute;left:0;right:0;top:50%;height:44px;transform:translateY(-50%)}}
 .bar #mode,.bar #mode:hover{background:var(--mode-accent,#edff00);border-color:var(--mode-accent,#edff00);color:#2a2a2a}
 </style></head><body>
 <main>
@@ -28,7 +32,7 @@ button:focus-visible,select:focus-visible{outline:2px solid var(--ink);outline-o
   <button id="pull" aria-label="Tap the logo to let him out. Hold to make the eyes strain, or drag to tear." aria-describedby="hint"></button>
   <div class="hint" id="hint"><svg viewBox="0 0 30 27" aria-hidden="true"><path d="M22 25C9 23 9 13 15 3M8 7L15 2L19 10" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>Tap to let him out.</div>
 </main>
-<div class="bar" aria-label="Play controls"><button class="sw" data-c="#2a2a2a" style="background:#2a2a2a" aria-label="Charcoal background" aria-pressed="true"></button><button class="sw" data-c="#cccccc" style="background:#cccccc" aria-label="Gray background" aria-pressed="false"></button><button class="sw" data-c="#edff00" style="background:#edff00" aria-label="Neon background" aria-pressed="false"></button><button class="sw" data-c="#ff6941" style="background:#ff6941" aria-label="Orange background" aria-pressed="false"></button><button id="mode">Mode: Bats</button><button id="clear">Clear</button></div>
+<div class="bar" aria-label="Play controls"><button class="sw" data-c="#2a2a2a" style="background:#2a2a2a" aria-label="Charcoal background" aria-pressed="true"></button><button class="sw" data-c="#edff00" style="background:#edff00" aria-label="Neon background" aria-pressed="false"></button><button class="sw" data-c="#ff6941" style="background:#ff6941" aria-label="Orange background" aria-pressed="false"></button><button id="mode">Mode: Bats</button><button id="clear">Clear</button></div>
 <button id="sound" aria-label="Turn sound on" aria-pressed="false">♪</button>
 <div id="status" class="sr" role="status" aria-live="polite"></div>
 <script src="bootstrap.js?v=35"></script><script src="idle.js?v=39"></script><script src="scene.js?v=37"></script><script src="surprise.js?v=34"></script><script src="rewards.js?v=34"></script><script src="palette.js?v=34"></script><script src="story27.js?v=37"></script><script src="sound.js?v=34"></script><script src="renderer.js?v=37"></script><script src="perf.js?v=34"></script><script src="app.js?v=40"></script></body></html>
