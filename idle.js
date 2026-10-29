@@ -10,8 +10,12 @@ function idleAct(now){
  return {t,name:frame>=46?'hide':t<1.28?'peek':t<1.60?'glance':t<1.80?'blink':t<2.48?'idea':'hide'};
 }
 function idleEyes(a){
+ // The film redraws the contour and pupil on twos. Scope it to these two
+ // small eyes; keep the expensive full-scene filters disabled on mobile.
+ const phase=interaction.reduced?0:Math.floor(a.t*12.5)%4;
+ const boil=`<defs><filter id="peekBoil" x="-15%" y="-15%" width="130%" height="130%" color-interpolation-filters="sRGB"><feTurbulence type="fractalNoise" baseFrequency=".04 .035" numOctaves="1" seed="${[7,19,3,11][phase]}" result="noise"/><feDisplacementMap in="SourceGraphic" in2="noise" scale="16" xChannelSelector="R" yChannelSelector="G"/></filter></defs>`;
  const eyes=CREATE_STORY.peekEyes(a.t)
   .replaceAll('#EDFF00',characterPalette(interaction.theme).eyes)
-  .replaceAll(' filter="url(#boilHand)"','');
- return '<g id="idle-eyes">'+eyes+'</g>';
+  .replaceAll('filter="url(#boilHand)"','filter="url(#peekBoil)"');
+ return '<g id="idle-eyes">'+boil+eyes+'</g>';
 }
