@@ -1,5 +1,5 @@
 const storyAudio=new Audio('assets/story27.mp3');storyAudio.preload='metadata';let storySound=false;
-const surpriseAudio=Object.fromEntries(['duck','party','kitten'].map(kind=>{const audio=new Audio(`assets/surprise-${kind}-v${kind==='kitten'?34:27}.mp3`);audio.preload='metadata';return[kind,audio]}));
+const surpriseAudio=Object.fromEntries(['duck','party','kitten'].map(kind=>{const audio=new Audio(`assets/surprise-${kind}-v${kind==='kitten'?44:27}.mp3`);audio.preload='metadata';return[kind,audio]}));
 const soundButton=document.querySelector('#sound');
 function stopStorySound(){storyAudio.pause();Object.values(surpriseAudio).forEach(audio=>audio.pause());}
 function startStorySound(t){stopStorySound();if(!storySound)return;const audio=interaction.reward==='bats'?storyAudio:interaction.reward==='surprise'?surpriseAudio[interaction.surprisePlan?.kind]:null;if(!audio)return;try{audio.currentTime=t;}catch{}audio.play().catch(()=>{});}
