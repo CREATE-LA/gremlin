@@ -3,6 +3,7 @@ const W=1080,H=1920,FPS=25,DURATION=8.68,CONTRAST=1.8;
 const SPRITE="assets/creature-atlas-r01.png";
 const CELS="assets/eye-cels-r01.png";
 const HANDCELS="assets/hand-cels-r01.png";
+const SLIMHANDCELS="assets/hand-cels-slim-r01.png";
 const BATATLAS="assets/bat-cels-r01.png";
 const TEAR="assets/tear.png";
 const PAPER="assets/paper.png";
@@ -208,7 +209,7 @@ function face(s,ey,q,t,actual=t){
  out+=`<g opacity="${f(mouthVisible)}" transform="translate(0 ${f(lower)})" filter="url(#boilEye)">${mouth}</g>`;
  return `<g transform="translate(${f(540+faceX)} ${f(960+faceY)}) rotate(${f(tilt)}) scale(${f(faceScale)}) translate(-540 -960)">${out}</g>`;
 }
-function counterEyes(s,t){
+function counterEyes(s,t,fullWindowActing=false){
  const finale=t>=7.72,hide=1-ramp(t,3.34,3.48,'fast');
  const finalVisible=pulse(t,7.72,7.86,8.86,9.02,'fast');
  const effort=pulse(t,2.88,3.04,3.12,3.30),idea=pulse(t,1.82,1.98,2.22,2.38);
@@ -218,8 +219,11 @@ function counterEyes(s,t){
   const cx=i?616:386,cy=(i?937:929)+24*(1-visible),rx=90;
   const lid=Math.max(.06,1-.70*effort-(i?.65:.25)*idea);
   const blink=finale?Math.max(pulse(t,8.10,8.14,8.17,8.22,'fast'),pulse(t,8.28,8.32,8.35,8.40,'fast')):pulse(t,1.60,1.64,1.68,1.76,'fast');
+  // Fill the counters at rest, but reach the film's lid shapes for its acting poses.
+  const pose=fullWindowActing?Math.max(idea,effort):0;
+  const eyeHeight=65*(1-pose)+22*lid*pose;
   const finalGaze=finale?(-15+30*ramp(t,7.96,8.02,'fast')-28*ramp(t,8.46,8.52,'fast')+12*ramp(t,8.68,8.74,'fast')+2.2*Math.sin(t*95)):s.gaze*.42;
-  out+=`<g opacity="${f(visible)}" transform="translate(${cx} ${f(cy)})" fill="#EDFF00" filter="url(#boilHand)"><ellipse rx="${rx}" ry="${f(65*lid*(1-.94*blink))}"/><ellipse cx="${f(finalGaze*(finale?(i?.28:.80):1))}" cy="${f(finale?-3+2*Math.sin(t*79+i):0)}" rx="${finale?3.4:7}" ry="${f((finale?5:12)*lid)}" fill="#2A2A2A"/></g>`;
+  out+=`<g opacity="${f(visible)}" transform="translate(${cx} ${f(cy)})" fill="#EDFF00" filter="url(#boilHand)"><ellipse rx="${rx}" ry="${f((fullWindowActing?eyeHeight:65*lid)*(1-.94*blink))}"/><ellipse cx="${f(finalGaze*(finale?(i?.28:.80):1))}" cy="${f(finale?-3+2*Math.sin(t*79+i):0)}" rx="${finale?3.4:7}" ry="${f((finale?5:12)*lid)}" fill="#2A2A2A"/></g>`;
  }
  return `<g clip-path="url(#letterWindows)">${out}</g>`;
 }
@@ -285,8 +289,8 @@ function insideHands(side,s,t){
  const rotate=(left?180:0)+(left?180:-180)*turnIn+(left?-1:1)*7*s.tension+5*Math.sin(t*65)*fright+9*Math.sin(t*85)*strain,box=HANDBOX[(left?0:3)+pose];
  const opacity=appear*(1-ramp(release,.20,.44,'soft'));
  const thumbBox=left?[641,349,220,99]:[683,815,216,105];
- const thumb=`<g opacity="${f(clench)}"><svg x="${f(center-hw*.30)}" y="${f(hy+hh*.52)}" width="${f(hw*.80)}" height="${f(hh*.47)}" viewBox="${thumbBox.join(' ')}" preserveAspectRatio="none" overflow="hidden"><image href="${HANDCELS}" width="1536" height="1024"/></svg></g>`;
- const hand=`<g opacity="${f(opacity)}" transform="translate(0 ${f(edge-LY)}) rotate(${rotate} ${center} ${LY})"><g filter="url(#boilHand)"><g filter="url(#marker)"><svg x="${f(center-hw/2)}" y="${f(hy)}" width="${f(hw)}" height="${f(hh)}" viewBox="${box.join(' ')}" preserveAspectRatio="none" overflow="hidden"><image href="${HANDCELS}" width="1536" height="1024"/></svg>${thumb}</g></g></g>`;
+ const thumb=`<g opacity="${f(clench)}"><svg x="${f(center-hw*.30)}" y="${f(hy+hh*.52)}" width="${f(hw*.80)}" height="${f(hh*.47)}" viewBox="${thumbBox.join(' ')}" preserveAspectRatio="none" overflow="hidden"><image href="${SLIMHANDCELS}" width="1536" height="1024"/></svg></g>`;
+ const hand=`<g opacity="${f(opacity)}" transform="translate(0 ${f(edge-LY)}) rotate(${rotate} ${center} ${LY})"><g filter="url(#boilHand)"><g filter="url(#marker)"><svg x="${f(center-hw/2)}" y="${f(hy)}" width="${f(hw)}" height="${f(hh)}" viewBox="${box.join(' ')}" preserveAspectRatio="none" overflow="hidden"><image href="${SLIMHANDCELS}" width="1536" height="1024"/></svg>${thumb}</g></g></g>`;
  // Original finger cel spans actual paper boundary; no wrist/forearm drawing.
  return release>=.12?{behind:`<g mask="url(#eyeInside)">${hand}</g>`,front:''}:{behind:'',front:hand};
 }
@@ -461,6 +465,7 @@ const filmState=state;
 window.CREATE_STORY.interactiveSvg=(t,open)=>{state=open===null?filmState:(time)=>({...filmState(time),rip:open});try{return svg(t)}finally{state=filmState}};
 window.CREATE_STORY.rewards=(realTime)=>bats(storyClock(performanceTime(editorialTime(sampleTime(realTime)))));
 const filmFace=face,filmBats=bats,filmHands=handLayers,filmCounters=counterEyes;
+window.CREATE_STORY.peekEyes=t=>filmCounters(filmState(t),t,true);
 window.CREATE_STORY.surpriseSvg=(input)=>{
  interaction.rewardClock=input;
  const a=surpriseAge(input),kind=interaction.surprisePlan?.kind||'duck',close=kind==='party'?6.75:6.65,span=kind==='party'?1.30:.64;

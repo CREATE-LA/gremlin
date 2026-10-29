@@ -2,6 +2,7 @@ const W=1080,H=1920,FPS=25,DURATION=6.4,CONTRAST=1.8;
 const SPRITE="assets/creature-atlas-r01.png";
 const CELS="assets/eye-cels-r01.png";
 const HANDCELS="assets/hand-cels-r01.png";
+const SLIMHANDCELS="assets/hand-cels-slim-r01.png";
 const BATATLAS="assets/bat-cels-r01.png";
 const TEAR="assets/tear.png";
 const PAPER="assets/paper.png";
@@ -110,7 +111,7 @@ function insideHands(side,s,t){
  const edge=940+750*q*(e-.5)+(left?1:-1)*190*retreat;
  const rotate=left?180:0,box=HANDBOX[(left?0:3)+pose];
  const opacity=appear*(1-ramp(release,.26,.36,'soft'));
- const hand=`<g opacity="${f(opacity)}" transform="translate(0 ${f(edge-LY)}) rotate(${rotate} ${center} ${LY})"><g filter="url(#boilHand)"><g filter="url(#marker)"><svg x="${f(center-hw/2)}" y="${f(hy)}" width="${f(hw)}" height="${f(hh)}" viewBox="${box.join(' ')}" preserveAspectRatio="none" overflow="hidden"><image href="${HANDCELS}" width="1536" height="1024"/></svg></g></g></g>`;
+ const hand=`<g opacity="${f(opacity)}" transform="translate(0 ${f(edge-LY)}) rotate(${rotate} ${center} ${LY})"><g filter="url(#boilHand)"><g filter="url(#marker)"><svg x="${f(center-hw/2)}" y="${f(hy)}" width="${f(hw)}" height="${f(hh)}" viewBox="${box.join(' ')}" preserveAspectRatio="none" overflow="hidden"><image href="${SLIMHANDCELS}" width="1536" height="1024"/></svg></g></g></g>`;
  // Original finger cel spans actual paper boundary; no wrist/forearm drawing.
  return release>=.12?{behind:`<g mask="url(#eyeInside)">${hand}</g>`,front:''}:{behind:'',front:hand};
 }
