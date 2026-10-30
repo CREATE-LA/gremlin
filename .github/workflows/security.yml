@@ -18,3 +18,4 @@ jobs:
       - run: python3 .github/scripts/check-security.py
       - run: node .github/scripts/check-sound.cjs
       - run: node .github/scripts/check-app.cjs
+      - run: node .github/scripts/check-analytics.cjs
