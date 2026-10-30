@@ -3,15 +3,17 @@ const storyAudio=document.querySelector('#score');
 const musicAudio=document.querySelector('#music');
 const soundButton=document.querySelector('#sound');
 const scores={bats:'story-v45.m4a',ghosts:'ghosts-fx-v55.m4a',eyes:'eyes-fx-v55.m4a',duck:'duck-fx-v55.m4a',party:'party-fx-v55.m4a',kitten:'kitten-fx-v55.m4a'};
-let storySound=true,soundGeneration=0,pendingSound=null,musicPending=false,soundSuspended=false;
+let storySound=true,soundGeneration=0,pendingSound=null,musicPending=false,musicGeneration=0,soundSuspended=false;
 function stopStorySound(){soundGeneration++;pendingSound=null;storyAudio.pause();storyAudio.setAttribute('data-playback','stopped');}
+function stopMusic(){musicGeneration++;musicPending=false;musicAudio.pause();}
 function startMusic(){
  if(!storySound||soundSuspended||document.hidden||musicPending||!musicAudio.paused)return;
- musicPending=true;
+ const generation=++musicGeneration;musicPending=true;
  musicAudio.play().then(()=>{
+  if(generation!==musicGeneration)return;
   musicPending=false;
-  if(!storySound||soundSuspended||document.hidden)musicAudio.pause();
- }).catch(()=>{musicPending=false;}); // Mobile autoplay can wait for the first tap.
+  if(!storySound||soundSuspended||document.hidden)stopMusic();
+ }).catch(()=>{if(generation===musicGeneration)musicPending=false;}); // Mobile autoplay can wait for the first tap.
 }
 function syncStorySound(){
  const pending=pendingSound;
@@ -58,7 +60,7 @@ soundButton.onclick=()=>{
  soundButton.setAttribute('aria-label',storySound?'Turn sound off':'Turn sound on');
  soundButton.style.opacity=storySound?'1':'.45';
  if(storySound){startMusic();if(mode==='playing')startStorySound(playFrom+(performance.now()-phaseAt)/1000);}
- else{stopStorySound();musicAudio.pause();}
+ else{stopStorySound();stopMusic();}
 };
 function unlockMusic(event){
  // The sound button owns its toggle; do not start audio just before muting it.
@@ -67,7 +69,7 @@ function unlockMusic(event){
  startMusic();
 }
 for(const event of ['pointerup','touchend','click','keydown','keyup'])document.addEventListener(event,unlockMusic,{passive:true});
-function suspendSound(){soundSuspended=true;stopStorySound();musicAudio.pause();}
+function suspendSound(){soundSuspended=true;stopStorySound();stopMusic();}
 function resumeSound(){soundSuspended=false;startMusic();}
 document.addEventListener('visibilitychange',()=>document.hidden?suspendSound():resumeSound());
 window.addEventListener('pagehide',suspendSound);
