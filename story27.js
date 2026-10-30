@@ -468,12 +468,12 @@ const filmFace=face,filmBats=bats,filmHands=handLayers,filmCounters=counterEyes;
 window.CREATE_STORY.peekEyes=t=>filmCounters(filmState(t),t,true);
 window.CREATE_STORY.surpriseSvg=(input)=>{
  interaction.rewardClock=input;
- const a=surpriseAge(input),kind=interaction.surprisePlan?.kind||'duck',close=kind==='party'?6.75:6.65,span=kind==='party'?1.30:.64;
+ const a=surpriseAge(input),kind=interaction.surprisePlan?.kind||'duck',close=kind==='kitten'?4.80:kind==='party'?6.75:6.65,span=kind==='kitten'?.48:kind==='party'?1.30:.64;
  const mapped=a<close?2.48+1.62*se(a,0,.85,'soft'):6.72+(6.10+1.30*clamp((a-close)/span)+.88-6.72)/1.8;
  face=()=>surpriseReaction();bats=()=>'';counterEyes=()=>'';
  handLayers=(side,s,t)=>surpriseHands(filmHands(side,s,t),side);
  state=t=>({...filmState(t),rays:a<1.1?filmState(t).rays:0});
- try{let art=svg(mapped);art=art.replace(/(<clipPath id="facehole">)<ellipse[^>]+\/>/, '$1<ellipse cx="540" cy="954" rx="435" ry="245"/>');return art.replace(/<\/svg>$/,surpriseScene(input)+'</svg>');}
+ try{let art=svg(mapped);if(kind==='kitten')art=art.replace('<svg ','<svg overflow="visible" ');art=art.replace(/(<clipPath id="facehole">)<ellipse[^>]+\/>/, '$1<ellipse cx="540" cy="954" rx="435" ry="245"/>');return art.replace(/<\/svg>$/,surpriseScene(input)+'</svg>');}
  finally{face=filmFace;bats=filmBats;handLayers=filmHands;counterEyes=filmCounters;state=filmState}
 };
 

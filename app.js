@@ -14,7 +14,7 @@ pull.addEventListener('pointerup',e=>{if(e.pointerId!==activePointer)return;acti
 pull.addEventListener('keydown',e=>{if([' ','Enter'].includes(e.key)){e.preventDefault();if(!e.repeat)begin(innerWidth/2,innerHeight/2)}if(e.key==='Escape')clear();});pull.addEventListener('keyup',e=>{if([' ','Enter'].includes(e.key)){e.preventDefault();release()}});pull.addEventListener('blur',()=>release(true));window.addEventListener('blur',()=>{activePointer=null;release(true)});
 function suspendPlay(){clear();lastDrawKey='';}
 document.addEventListener('visibilitychange',()=>{if(document.hidden)suspendPlay();else{last=0;perfPrevious=0;render(performance.now());}});window.addEventListener('pagehide',suspendPlay);window.addEventListener('pageshow',()=>{last=0;perfPrevious=0;render(performance.now());});
-modeButton.onclick=()=>{selected=(selected+1)%choices.length;modeButton.textContent='Mode: '+labels[selected];statusEl.textContent=labels[selected]+' selected';};document.querySelector('#clear').onclick=clear;
+modeButton.onclick=()=>{selected=(selected+1)%choices.length;modeButton.textContent='Mode: '+labels[selected];statusEl.textContent=labels[selected]+' selected';if(selected===3)warmKitten();};document.querySelector('#clear').onclick=clear;
 for(const b of document.querySelectorAll('.sw'))b.onclick=()=>{interaction.theme=b.dataset.c;warmTheme(interaction.theme);const dark=b.dataset.c==='#2a2a2a',style=document.documentElement.style;style.setProperty('--bg',b.dataset.c);style.setProperty('--mode-accent',b.dataset.c==='#edff00'?'#ff6941':'#edff00');style.setProperty('--ink',dark?'#cccccc':'#2a2a2a');style.setProperty('--btn-fg',dark?'#2a2a2a':b.dataset.c);style.setProperty('--hov',dark?'#d9d9d9':'#262626');for(const a of document.querySelectorAll('.sw'))a.setAttribute('aria-pressed',String(a===b));};
 function render(now){interaction.clock=now/1000;interaction.idleExpression=null;
 if(mode==='idle'){time=1.8;interaction.open=0;interaction.idleExpression=idleAct(now);}
@@ -39,6 +39,7 @@ function warmImage(file){
  image.onerror=()=>{warmImages.delete(file);finish()};
  image.src='assets/mobile/'+file+'.webp';return promise;
 }
+function warmKitten(){return Promise.all(KITTEN53.pages.map(p=>warmImage(p.file.replace('.webp',''))));}
 function warmTheme(theme){return Promise.all([...warmFiles.map(f=>f+'-'+theme.slice(1)), 'holeThreshold','paperSurfaceThreshold','paperGrain'].map(warmImage));}
 warmTheme(interaction.theme).then(()=>{perfSample.ready=performance.now()-perfStart;});
 requestAnimationFrame(tick);
