@@ -28,7 +28,7 @@ function startStorySound(t){
  startMusic();
  const kind=interaction.reward==='surprise'?interaction.surprisePlan?.kind:interaction.reward;
  if(!Object.hasOwn(scores,kind))return;
- const src='assets/'+scores[kind]+'?v=55.1';
+ const src='assets/'+scores[kind]+'?v=55.2';
  pendingSound={generation:soundGeneration,time:t,started:performance.now()};
  if(storyAudio.getAttribute('src')!==src)storyAudio.src=src;
  syncStorySound();
