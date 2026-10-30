@@ -19,5 +19,5 @@ const kinds=JSON.parse(h.get('JSON.stringify(Array.from({length:3},()=>nextSurpr
 report.frames=frames;report.assets=[...assets];report.viewports=4;report.themes=2;report.rewards=6;report.interactions='tap, drag/cancel, lost focus, keyboard, Clear, select-only and shuffle passed';
 console.log({...report,assets:assets.size});
 
-h.get('selected=2');h.elements.mode.onclick();await new Promise(setImmediate);assert(h.imageLoads.filter(x=>x.includes('kitten-')).length===4,'Selecting Surprise warms all four cat pages');
+h.get('selected=2');h.elements.mode.onclick();await new Promise(setImmediate);assert(h.imageLoads.filter(x=>x.includes('kitten-')).length===3,'Selecting Surprise warms all three current cat pages');
 })().catch(e=>{console.error(e);process.exitCode=1});
