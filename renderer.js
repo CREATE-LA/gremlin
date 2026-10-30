@@ -8,7 +8,14 @@ function syncNode(oldNode,newNode){
  let i=0;for(;i<newNode.childNodes.length;i++){const n=newNode.childNodes[i],o=oldNode.childNodes[i];if(!o)oldNode.appendChild(n.cloneNode(true));else if(!o.isEqualNode(n))syncNode(o,n);}
  while(oldNode.childNodes.length>i)oldNode.lastChild.remove();
 }
+// Every scene uses the same authored logo center (y=940). Move the full
+// coordinate system together, including the hands, tear and released creatures.
+function centeredArt(art){
+ const view=innerWidth>innerHeight?'0 400 1080 1080':'0 -20 1080 1920';
+ return art.replace(/^(<svg\b[^>]*?viewBox=")[^"]*(")/,(_,before,after)=>before+view+after);
+}
 function preparedArt(art,theme){
+ art=centeredArt(art);
  const tone=theme.slice(1);
  art=art.replace(/filter="url\(#(holeThreshold|paperSurfaceThreshold)\)" href="assets\/tear.png"/g,(_,id)=>`href="assets/mobile/${id}.webp"`);
  art=art.replaceAll('assets/paper.png','assets/mobile/paperGrain.webp');
