@@ -473,7 +473,7 @@ window.CREATE_STORY.surpriseSvg=(input)=>{
  face=()=>surpriseReaction();bats=()=>'';counterEyes=()=>'';
  handLayers=(side,s,t)=>surpriseHands(filmHands(side,s,t),side);
  state=t=>({...filmState(t),rays:a<1.1?filmState(t).rays:0});
- try{let art=svg(mapped);art=art.replace(/(<clipPath id="facehole">)<ellipse[^>]+\/>/, '$1<ellipse cx="540" cy="954" rx="435" ry="245"/>');return art.replace(/<\/svg>$/,surpriseScene(input)+'</svg>');}
+ try{let art=svg(mapped);if(kind==='kitten')art=art.replace('<svg ','<svg overflow="visible" ');art=art.replace(/(<clipPath id="facehole">)<ellipse[^>]+\/>/, '$1<ellipse cx="540" cy="954" rx="435" ry="245"/>');return art.replace(/<\/svg>$/,surpriseScene(input)+'</svg>');}
  finally{face=filmFace;bats=filmBats;handLayers=filmHands;counterEyes=filmCounters;state=filmState}
 };
 
