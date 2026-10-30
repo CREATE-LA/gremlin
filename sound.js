@@ -2,7 +2,7 @@
 const storyAudio=document.querySelector('#score');
 const musicAudio=document.querySelector('#music');
 const soundButton=document.querySelector('#sound');
-const scores={bats:'story-v45.m4a',ghosts:'ghosts-fx-v55.m4a',eyes:'eyes-fx-v55.m4a',duck:'duck-fx-v55.m4a',party:'party-fx-v55.m4a',kitten:'kitten-fx-v55.m4a'};
+const scores={bats:'story-v45.m4a',ghosts:'ghosts-fx-v55.m4a',eyes:'eyes-fx-v55.m4a',duck:'duck-fx-v55.m4a',party:'party-fx-v62.m4a',kitten:'kitten-fx-v62.m4a'};
 let storySound=true,soundGeneration=0,pendingSound=null,musicPending=false,musicGeneration=0,soundSuspended=false;
 function stopStorySound(){soundGeneration++;pendingSound=null;storyAudio.pause();storyAudio.setAttribute('data-playback','stopped');}
 function stopMusic(){musicGeneration++;musicPending=false;musicAudio.pause();}
