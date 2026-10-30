@@ -1,7 +1,7 @@
 // One player prevents overlapping rewards and preserves mobile gesture playback.
 const storyAudio=document.querySelector('#score');
 const soundButton=document.querySelector('#sound');
-const scores={bats:'story-v45.m4a',ghosts:'ghosts-v45.mp3',eyes:'eyes-v45.mp3',duck:'surprise-duck-v45.mp3',party:'surprise-party-v45.mp3',kitten:'surprise-kitten-v46.mp3'};
+const scores={bats:'story-v45.m4a',ghosts:'ghosts-v47.mp3',eyes:'eyes-v47.mp3',duck:'surprise-duck-v47.mp3',party:'surprise-party-v47.mp3',kitten:'surprise-kitten-v47.mp3'};
 let storySound=false,soundGeneration=0,pendingSound=null;
 function stopStorySound(){soundGeneration++;pendingSound=null;storyAudio.pause();}
 function syncStorySound(){
@@ -20,7 +20,7 @@ function startStorySound(t){
  stopStorySound();if(!storySound)return;
  const kind=interaction.reward==='surprise'?interaction.surprisePlan?.kind:interaction.reward;
  if(!Object.hasOwn(scores,kind))return;
- const src='assets/'+scores[kind]+'?v=45.3';
+ const src='assets/'+scores[kind]+'?v=47.2';
  pendingSound={generation:soundGeneration,time:t,started:performance.now()};
  if(storyAudio.getAttribute('src')!==src)storyAudio.src=src;
  syncStorySound();
