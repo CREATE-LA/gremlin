@@ -468,7 +468,7 @@ const filmFace=face,filmBats=bats,filmHands=handLayers,filmCounters=counterEyes;
 window.CREATE_STORY.peekEyes=t=>filmCounters(filmState(t),t,true);
 window.CREATE_STORY.surpriseSvg=(input)=>{
  interaction.rewardClock=input;
- const a=surpriseAge(input),kind=interaction.surprisePlan?.kind||'duck',close=kind==='kitten'?3.70:kind==='party'?6.75:6.65,span=kind==='kitten'?.48:kind==='party'?1.30:.64;
+ const a=surpriseAge(input),kind=interaction.surprisePlan?.kind||'duck',close=kind==='kitten'?4.80:kind==='party'?6.75:6.65,span=kind==='kitten'?.48:kind==='party'?1.30:.64;
  const mapped=a<close?2.48+1.62*se(a,0,.85,'soft'):6.72+(6.10+1.30*clamp((a-close)/span)+.88-6.72)/1.8;
  face=()=>surpriseReaction();bats=()=>'';counterEyes=()=>'';
  handLayers=(side,s,t)=>surpriseHands(filmHands(side,s,t),side);
