@@ -4,7 +4,7 @@ const musicAudio=document.querySelector('#music');
 const soundButton=document.querySelector('#sound');
 const scores={bats:'story-v45.m4a',ghosts:'ghosts-fx-v55.m4a',eyes:'eyes-fx-v55.m4a',duck:'duck-fx-v55.m4a',party:'party-fx-v55.m4a',kitten:'kitten-fx-v55.m4a'};
 let storySound=true,soundGeneration=0,pendingSound=null,musicPending=false,soundSuspended=false;
-function stopStorySound(){soundGeneration++;pendingSound=null;storyAudio.pause();}
+function stopStorySound(){soundGeneration++;pendingSound=null;storyAudio.pause();storyAudio.setAttribute('data-playback','stopped');}
 function startMusic(){
  if(!storySound||soundSuspended||document.hidden||musicPending||!musicAudio.paused)return;
  musicPending=true;
@@ -23,16 +23,34 @@ function syncStorySound(){
 storyAudio.addEventListener('loadedmetadata',syncStorySound);
 storyAudio.addEventListener('playing',syncStorySound);
 storyAudio.addEventListener('timeupdate',syncStorySound);
+// Keep the effects request pending if a browser rejects the first pointer event.
+// Retry synchronously on touchend/click/keyup, which mobile media policies recognize.
+function playPendingEffects(){
+ const pending=pendingSound;
+ if(!pending||pending.generation!==soundGeneration||!storySound||soundSuspended||document.hidden)return;
+ syncStorySound();
+ if(pendingSound!==pending)return;
+ storyAudio.setAttribute('data-playback','starting');
+ storyAudio.play().then(()=>{
+  if(pendingSound!==pending)return;
+  storyAudio.setAttribute('data-playback','playing');
+  storyAudio.removeAttribute('data-playback-error');
+  syncStorySound();
+ }).catch(error=>{
+  if(pendingSound!==pending)return;
+  storyAudio.setAttribute('data-playback','blocked');
+  storyAudio.setAttribute('data-playback-error',error.name||'PlaybackError');
+ });
+}
 function startStorySound(t){
  stopStorySound();if(!storySound||soundSuspended||document.hidden)return;
- startMusic();
  const kind=interaction.reward==='surprise'?interaction.surprisePlan?.kind:interaction.reward;
  if(!Object.hasOwn(scores,kind))return;
  const src='assets/'+scores[kind]+'?v=55.4';
  pendingSound={generation:soundGeneration,time:t,started:performance.now()};
  if(storyAudio.getAttribute('src')!==src)storyAudio.src=src;
- syncStorySound();
- storyAudio.play().catch(()=>{});
+ playPendingEffects();
+ startMusic();
 }
 soundButton.onclick=()=>{
  storySound=!storySound;
@@ -45,9 +63,10 @@ soundButton.onclick=()=>{
 function unlockMusic(event){
  // The sound button owns its toggle; do not start audio just before muting it.
  if(event.target===soundButton||soundButton.contains(event.target))return;
+ if(pendingSound&&storyAudio.paused)playPendingEffects();
  startMusic();
 }
-for(const event of ['pointerup','touchend','click','keydown'])document.addEventListener(event,unlockMusic,{passive:true});
+for(const event of ['pointerup','touchend','click','keydown','keyup'])document.addEventListener(event,unlockMusic,{passive:true});
 function suspendSound(){soundSuspended=true;stopStorySound();musicAudio.pause();}
 function resumeSound(){soundSuspended=false;startMusic();}
 document.addEventListener('visibilitychange',()=>document.hidden?suspendSound():resumeSound());
