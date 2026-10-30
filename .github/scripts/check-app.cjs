@@ -1,0 +1,23 @@
+const fs=require('fs'),vm=require('vm'),assert=require('assert/strict'),path=require('path');
+const root=path.resolve(__dirname,'../..');
+function harness(){let now=0;const events={},elements={},imageLoads=[];const make=()=>({classList:{add(){}},style:{setProperty(){}},pause(){},play(){return Promise.resolve()},getAttribute(n){return this.attrs[n]},dataset:{},textContent:'',attrs:{},setAttribute(n,v){this.attrs[n]=v},setPointerCapture(){},addEventListener(){}});for(const id of ['scene','pull','hint','status','mode','clear','sound','score','music']){elements[id]=make();elements[id].addEventListener=(t,fn)=>events[id+':'+t]=fn}const swatches=['#2a2a2a','#ff6941'].map(c=>({...make(),dataset:{c}}));const context=vm.createContext({document:{querySelector:s=>elements[s.slice(1)],querySelectorAll:()=>swatches,documentElement:make(),hidden:false,addEventListener(t,fn){events['document:'+t]=fn},createElement:()=>make()},addEventListener(t,fn){events['window:'+t]=fn},innerWidth:390,innerHeight:694,interaction:{open:null,look:0,reduced:false,reward:'bats',theme:'#2a2a2a'},performance:{now:()=>now},requestAnimationFrame(){},setTimeout(){},Audio:class{pause(){}play(){return Promise.resolve()}},Image:class{set src(v){imageLoads.push(v);this.onload()}},console});context.window=context;for(const f of ['idle.js','scene.js','surprise.js','rewards.js','palette.js','story27.js','sound.js','renderer.js','perf.js'])vm.runInContext(fs.readFileSync(root+'/'+f,'utf8'),context);vm.runInContext("presentIdle=()=>false;presentScene=art=>{document.querySelector('#scene').innerHTML=art}",context);vm.runInContext(fs.readFileSync(root+'/app.js','utf8'),context);const get=e=>vm.runInContext(e,context);const event=(type,e={})=>events[type]({button:0,pointerId:1,clientX:195,clientY:350,preventDefault(){},...e});const frame=t=>{now=t;get(`render(${t})`)};return {elements,swatches,get,event,frame,imageLoads};
+}
+(async()=>{const h=harness();await new Promise(setImmediate);assert(!h.imageLoads.some(x=>x.includes('kitten-')),'Cat pages should not load before Surprise selection');
+let frames=0;const assets=new Set(),report={};
+for(const [w,hh] of [[320,568],[390,844],[844,390],[1920,1080]])for(const theme of ['#2a2a2a','#ff6941'])for(const kind of ['bats','ghosts','eyes','duck','party','kitten']){
+ h.get(`innerWidth=${w};innerHeight=${hh};interaction.theme='${theme}';interaction.reward='${['duck','party','kitten'].includes(kind)?'surprise':kind}';interaction.surprisePlan={kind:'${kind}'};mode='playing';playFrom=0;phaseAt=0`);
+ const end=h.get('rewardEnd(interaction.reward)');for(let i=0;i<end*25;i++){h.frame(i*40);const art=h.elements.scene.innerHTML;assert(!/NaN|undefined|Infinity/.test(art),kind+' invalid frame '+i);assert(art.startsWith('<svg'));for(const match of art.matchAll(/href="(assets\/[^"]+)"/g)){assets.add(match[1]);assert(fs.existsSync(path.join(root,match[1])),match[1])}frames++}
+ h.frame((end+.1)*1000);assert.equal(h.get('mode'),'idle',kind+' returns idle');
+}
+h.frame(100000);h.event('pull:pointerdown');assert.equal(h.get('mode'),'holding');h.event('window:pointermove',{clientX:200,clientY:360});h.event('pull:pointercancel');h.frame(101000);assert.equal(h.get('mode'),'idle');
+h.event('pull:pointerdown');h.event('window:pointermove',{clientX:500,clientY:350});h.event('pull:pointerup');assert.equal(h.get('mode'),'playing');h.get('clear()');assert.equal(h.get('held'),false);assert.equal(h.get('mode'),'idle');
+h.event('pull:keydown',{key:'Enter',repeat:false});h.event('pull:keyup',{key:'Enter'});assert.equal(h.get('mode'),'playing');h.event('pull:keydown',{key:'Escape'});assert.equal(h.get('mode'),'idle');
+h.event('pull:pointerdown');h.event('window:blur');h.frame(102000);assert.equal(h.get('mode'),'idle');
+// Mode selection does not release the creature; Surprise is a shuffled bag.
+h.get('clear();selected=0');h.elements.mode.onclick();assert.equal(h.get('mode'),'idle');
+const kinds=JSON.parse(h.get('JSON.stringify(Array.from({length:3},()=>nextSurprise().kind))'));assert.equal(new Set(kinds).size,3);
+report.frames=frames;report.assets=[...assets];report.viewports=4;report.themes=2;report.rewards=6;report.interactions='tap, drag/cancel, lost focus, keyboard, Clear, select-only and shuffle passed';
+console.log({...report,assets:assets.size});
+
+h.get('selected=2');h.elements.mode.onclick();await new Promise(setImmediate);assert(h.imageLoads.filter(x=>x.includes('kitten-')).length===4,'Selecting Surprise warms all four cat pages');
+})().catch(e=>{console.error(e);process.exitCode=1});

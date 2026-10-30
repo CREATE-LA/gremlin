@@ -41,5 +41,5 @@ function warmImage(file){
 }
 function warmKitten(){return Promise.all(KITTEN53.pages.map(p=>warmImage(p.file.replace('.webp',''))));}
 function warmTheme(theme){return Promise.all([...warmFiles.map(f=>f+'-'+theme.slice(1)), 'holeThreshold','paperSurfaceThreshold','paperGrain'].map(warmImage));}
-warmTheme(interaction.theme).then(()=>{perfSample.ready=performance.now()-perfStart;warmKitten();});
+warmTheme(interaction.theme).then(()=>{perfSample.ready=performance.now()-perfStart;});
 requestAnimationFrame(tick);
