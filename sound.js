@@ -15,21 +15,25 @@ function startMusic(){
   if(!storySound||soundSuspended||document.hidden)stopMusic();
  }).catch(()=>{if(generation===musicGeneration)musicPending=false;}); // Mobile autoplay can wait for the first tap.
 }
+// Align once when starting/retrying. Seeking during playing/timeupdate interrupts
+// mobile AAC decoding and can create an endless seek → playing → seek loop.
 function syncStorySound(){
  const pending=pendingSound;
- if(!pending||pending.generation!==soundGeneration||!storySound||storyAudio.readyState<1)return;
+ if(!pending||pending.generation!==soundGeneration||!storySound||pending.aligned||storyAudio.readyState<1)return;
  const position=pending.time+(performance.now()-pending.started)/1000;
  if(Number.isFinite(storyAudio.duration)&&position>=storyAudio.duration){stopStorySound();return;}
- if(Math.abs(storyAudio.currentTime-position)>.08){try{storyAudio.currentTime=Math.max(0,position);}catch{}}
+ try{
+  if(Math.abs(storyAudio.currentTime-position)>.08)storyAudio.currentTime=Math.max(0,position);
+  pending.aligned=true;
+ }catch{}
 }
 storyAudio.addEventListener('loadedmetadata',syncStorySound);
-storyAudio.addEventListener('playing',syncStorySound);
-storyAudio.addEventListener('timeupdate',syncStorySound);
 // Keep the effects request pending if a browser rejects the first pointer event.
 // Retry synchronously on touchend/click/keyup, which mobile media policies recognize.
 function playPendingEffects(){
  const pending=pendingSound;
  if(!pending||pending.generation!==soundGeneration||!storySound||soundSuspended||document.hidden)return;
+ pending.aligned=false;
  syncStorySound();
  if(pendingSound!==pending)return;
  storyAudio.setAttribute('data-playback','starting');
@@ -37,7 +41,6 @@ function playPendingEffects(){
   if(pendingSound!==pending)return;
   storyAudio.setAttribute('data-playback','playing');
   storyAudio.removeAttribute('data-playback-error');
-  syncStorySound();
  }).catch(error=>{
   if(pendingSound!==pending)return;
   storyAudio.setAttribute('data-playback','blocked');
@@ -49,7 +52,7 @@ function startStorySound(t){
  const kind=interaction.reward==='surprise'?interaction.surprisePlan?.kind:interaction.reward;
  if(!Object.hasOwn(scores,kind))return;
  const src='assets/'+scores[kind]+'?v=55.4';
- pendingSound={generation:soundGeneration,time:t,started:performance.now()};
+ pendingSound={generation:soundGeneration,time:t,started:performance.now(),aligned:false};
  if(storyAudio.getAttribute('src')!==src)storyAudio.src=src;
  playPendingEffects();
  startMusic();
