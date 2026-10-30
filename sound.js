@@ -22,7 +22,7 @@ function startStorySound(t){
  stopStorySound();if(!storySound)return;
  const kind=interaction.reward==='surprise'?interaction.surprisePlan?.kind:interaction.reward;
  if(!Object.hasOwn(scores,kind))return;
- const src='assets/'+scores[kind]+'?v=49.4';
+ const src='assets/'+scores[kind]+'?v=49.5';
  pendingSound={generation:soundGeneration,time:t,started:performance.now()};
  if(storyAudio.getAttribute('src')!==src)storyAudio.src=src;
  syncStorySound();
