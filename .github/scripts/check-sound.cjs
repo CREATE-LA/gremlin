@@ -37,6 +37,13 @@ assert(Math.abs(audio.currentTime-3.37)<.001,'recovered FX catch up instead of r
 run('stopStorySound()');const playsAfterClear=audio.plays;docEvents.click({target:{}});await settle();assert.equal(audio.plays,playsAfterClear,'Clear cancels retry');
 // A stale rejection after Clear must not restore a blocked state or replay old FX.
 audio.block=true;run('startStorySound(3.12);stopStorySound()');await settle();assert.equal(audio.attrs['data-playback'],'stopped');
+// A pending play promise must not block a new resume after a page interruption.
+await settle();music.pause();const originalMusicPlay=music.play;let rejectInterrupted;
+music.play=function(){this.plays++;return new Promise((resolve,reject)=>{rejectInterrupted=reject})};
+run('startMusic()');document.hidden=true;docEvents.visibilitychange();
+music.play=originalMusicPlay;document.hidden=false;docEvents.visibilitychange();await settle();
+assert(!music.paused,'returning to the page retries music even while the old play promise is pending');
+rejectInterrupted(new Error('Interrupted old start'));await settle();assert(!music.paused,'stale play rejection must not disturb resumed music');
 const html=fs.readFileSync(__dirname+'/../../index.html','utf8');assert(html.includes('id="music" src="assets/music-bed-v55.m4a" loop'));assert(html.includes('aria-label="Turn sound off" aria-pressed="true"'));
 console.log('Audio lifecycle passed: default on, blocked-autoplay first-tap recovery, continuous bed, all rewards, sync, mute races, visibility, Clear and asset allowlist.');
 })().catch(e=>{console.error(e);process.exitCode=1});
