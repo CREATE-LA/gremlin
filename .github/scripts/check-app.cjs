@@ -6,7 +6,7 @@ function harness(){let now=0;const events={},elements={},imageLoads=[];const mak
 let frames=0;const assets=new Set(),report={};
 for(const [w,hh] of [[320,568],[390,844],[844,390],[1920,1080]])for(const theme of ['#2a2a2a','#ff6941'])for(const kind of ['bats','ghosts','eyes','duck','party','kitten']){
  h.get(`innerWidth=${w};innerHeight=${hh};interaction.theme='${theme}';interaction.reward='${['duck','party','kitten'].includes(kind)?'surprise':kind}';interaction.surprisePlan={kind:'${kind}'};mode='playing';playFrom=0;phaseAt=0`);
- const end=h.get('rewardEnd(interaction.reward)');for(let i=0;i<end*25;i++){h.frame(i*40);const art=h.elements.scene.innerHTML;assert(!/NaN|undefined|Infinity/.test(art),kind+' invalid frame '+i);assert(art.startsWith('<svg'));for(const match of art.matchAll(/href="(assets\/[^"]+)"/g)){assets.add(match[1]);assert(fs.existsSync(path.join(root,match[1])),match[1])}frames++}
+ const end=h.get('rewardEnd(interaction.reward)');for(let i=0;i<end*25;i++){h.frame(i*40);const art=h.elements.scene.innerHTML;assert(!/NaN|undefined|Infinity/.test(art),kind+' invalid frame '+i);assert(art.startsWith('<svg'));assert(art.includes(w>hh?'viewBox="0 400 1080 1080"':'viewBox="0 -20 1080 1920"'),'Every mode keeps logo center at the play-area midpoint');for(const match of art.matchAll(/href="(assets\/[^"]+)"/g)){assets.add(match[1]);assert(fs.existsSync(path.join(root,match[1])),match[1])}frames++}
  h.frame((end+.1)*1000);assert.equal(h.get('mode'),'idle',kind+' returns idle');
 }
 h.frame(100000);h.event('pull:pointerdown');assert.equal(h.get('mode'),'holding');h.event('window:pointermove',{clientX:200,clientY:360});h.event('pull:pointercancel');h.frame(101000);assert.equal(h.get('mode'),'idle');
