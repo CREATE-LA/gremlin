@@ -2,7 +2,7 @@ const fs=require('fs'),vm=require('vm'),assert=require('assert/strict');
 (async()=>{
 let now=0;const docEvents={},winEvents={};
 function player(block=false){return {attrs:{},events:{},plays:0,readyState:0,duration:NaN,currentTime:0,paused:true,block,
- addEventListener(n,f){this.events[n]=f},getAttribute(n){return this.attrs[n]??null},
+ setAttribute(k,v){this.attrs[k]=v},removeAttribute(k){delete this.attrs[k]},addEventListener(n,f){this.events[n]=f},getAttribute(n){return this.attrs[n]??null},
  set src(v){this.attrs.src=v;this.readyState=0;this.duration=NaN;this.currentTime=0},get src(){return this.attrs.src},
  pause(){this.paused=true},play(){this.plays++;if(this.block)return Promise.reject(new Error('Autoplay blocked'));this.paused=false;return Promise.resolve()}}}
 const audio=player(),music=player(true),button={style:{},attrs:{},contains:()=>false,setAttribute(k,v){this.attrs[k]=v}};
@@ -24,6 +24,19 @@ run('stopStorySound()');const count=audio.plays;audio.events.loadedmetadata();au
 context.interaction.reward='__proto__';run('startStorySound(0)');assert.equal(audio.plays,count);
 // A pending autoplay resolution cannot undo a mute/page suspension.
 music.pause();run('startMusic()');button.onclick();await settle();assert(music.paused&&audio.paused);assert.equal(button.attrs['aria-pressed'],'false');
+// Real regression: background music works while the first effects play is denied.
+button.onclick();await settle();assert(!music.paused);
+context.interaction.reward='ghosts';audio.block=true;
+run('startStorySound(3.12)');await settle();
+assert(audio.paused&&!music.paused);assert.equal(audio.attrs['data-playback'],'blocked');
+now+=250;audio.block=false;audio.readyState=1;audio.duration=14;
+docEvents.touchend({target:{}});await settle();
+assert(!audio.paused,'touchend recovers blocked FX independently of music');
+assert.equal(audio.attrs['data-playback'],'playing');assert(!audio.attrs['data-playback-error']);
+assert(Math.abs(audio.currentTime-3.37)<.001,'recovered FX catch up instead of restarting');
+run('stopStorySound()');const playsAfterClear=audio.plays;docEvents.click({target:{}});await settle();assert.equal(audio.plays,playsAfterClear,'Clear cancels retry');
+// A stale rejection after Clear must not restore a blocked state or replay old FX.
+audio.block=true;run('startStorySound(3.12);stopStorySound()');await settle();assert.equal(audio.attrs['data-playback'],'stopped');
 const html=fs.readFileSync(__dirname+'/../../index.html','utf8');assert(html.includes('id="music" src="assets/music-bed-v55.m4a" loop'));assert(html.includes('aria-label="Turn sound off" aria-pressed="true"'));
 console.log('Audio lifecycle passed: default on, blocked-autoplay first-tap recovery, continuous bed, all rewards, sync, mute races, visibility, Clear and asset allowlist.');
 })().catch(e=>{console.error(e);process.exitCode=1});
