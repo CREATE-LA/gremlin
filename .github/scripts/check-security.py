@@ -15,9 +15,10 @@ class Page(HTMLParser):
         self.handlers.extend(k for k in a if k.lower().startswith('on'))
 page = Page(); page.feed((root / 'index.html').read_text())
 policy = dict((parts[0], parts[1:]) for item in page.metas.get('content-security-policy', '').split(';') if (parts := item.split()))
-for directive in ['default-src', 'connect-src', 'object-src', 'base-uri', 'form-action', 'frame-src', 'worker-src']:
+for directive in ['default-src', 'object-src', 'base-uri', 'form-action', 'frame-src', 'worker-src']:
     assert policy.get(directive) == ["'none'"], directive
-assert policy.get('script-src') == ["'self'"]
+assert policy.get('script-src') == ["'self'", "https://static.cloudflareinsights.com/beacon.min.js"]
+assert policy.get('connect-src') == ["https://cloudflareinsights.com/cdn-cgi/rum"]
 assert policy.get('script-src-attr') == ["'none'"]
 assert policy.get('img-src') == ["'self'"]
 assert policy.get('media-src') == ["'self'"]
@@ -29,7 +30,7 @@ for src in page.scripts:
     assert ':' not in path and not path.startswith('/') and '..' not in Path(path).parts, src
     assert (root / path).is_file(), src
 # Public root is intentionally small; workflow files are hidden from Pages.
-allowed = {'.nojekyll', '.gitignore', 'SECURITY.md', 'index.html', 'bootstrap.js', 'app.js', 'idle.js', 'scene.js', 'surprise.js', 'rewards.js', 'palette.js', 'story24.js', 'story27.js', 'sound.js', 'renderer.js', 'perf.js'}
+allowed = {'.nojekyll', '.gitignore', 'SECURITY.md', 'analytics.js', 'index.html', 'bootstrap.js', 'app.js', 'idle.js', 'scene.js', 'surprise.js', 'rewards.js', 'palette.js', 'story24.js', 'story27.js', 'sound.js', 'renderer.js', 'perf.js'}
 files = subprocess.check_output(['git', '-C', str(root), 'ls-files'], text=True).splitlines()
 for name in files:
     p = Path(name)
