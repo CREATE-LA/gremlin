@@ -16,6 +16,8 @@ function syncStorySound(){
 }
 storyAudio.addEventListener('loadedmetadata',syncStorySound);
 storyAudio.addEventListener('playing',syncStorySound);
+// Some mobile decoders settle behind the requested seek after playback begins.
+storyAudio.addEventListener('timeupdate',syncStorySound);
 function startStorySound(t){
  stopStorySound();if(!storySound)return;
  const kind=interaction.reward==='surprise'?interaction.surprisePlan?.kind:interaction.reward;

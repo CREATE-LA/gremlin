@@ -7,6 +7,8 @@ run('stopStorySound()');const before=audio.currentTime;now=1200;events.playing()
 for(const kind of ['bats','ghosts','eyes','duck','party','kitten']){context.interaction.reward=['duck','party','kitten'].includes(kind)?'surprise':kind;context.interaction.surprisePlan={kind};run('startStorySound(3.12)');assert(audio.src.includes(kind==='bats'?'story':kind));assert(!audio.paused);}
 now+=500;audio.readyState=1;audio.duration=14;events.loadedmetadata();assert(Math.abs(audio.currentTime-3.62)<.001);const settled=audio.currentTime;now+=20;events.playing();assert.equal(audio.currentTime,settled,'playing does not cause seek/playing loop');
 context.mode='playing';context.time=6.46;context.playFrom=6.5;context.phaseAt=now;button.onclick();assert(audio.paused,'mute pauses');button.onclick();assert(!audio.paused,'unmute resumes in gesture');assert(Math.abs(audio.currentTime-6.5)<.001,'unmute uses the fresh animation clock, not a stale frame');
-run('stopStorySound()');const playCount=plays;events.loadedmetadata();events.playing();assert.equal(plays,playCount,'clear never replays through a pending load');
+now+=500;audio.currentTime=6.53;events.timeupdate();assert(Math.abs(audio.currentTime-7)<.001,'decoder drift catches up to the live picture');
+const onTime=audio.currentTime;now+=20;events.timeupdate();assert.equal(audio.currentTime,onTime,'small frame differences do not cause repeated seeks');
+run('stopStorySound()');const playCount=plays;events.loadedmetadata();events.playing();events.timeupdate();assert.equal(plays,playCount,'clear never replays through a pending load');
 context.interaction.reward='__proto__';run('startStorySound(0)');assert.equal(plays,playCount,'only explicit built-in assets accepted');
-console.log('10 audio lifecycle checks passed');
+console.log('12 audio lifecycle checks passed');

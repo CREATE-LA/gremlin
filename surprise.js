@@ -69,79 +69,47 @@ function surpriseReaction(){const a=surpriseAge(interaction.rewardClock??3.12),k
  return `<g data-emotion="${kind}" filter="url(#boilEye)" mask="url(#s27dry)" transform="translate(${f(530+body.x)} ${f(970+body.y)}) rotate(${f(body.rot)}) scale(${f(body.sx)} ${f(body.sy)}) translate(-530 -970)">${out}</g>`;
 }
 function surpriseHands(h,side){const a=surpriseAge(interaction.rewardClock??3.12),kind=interaction.surprisePlan?.kind||'duck';let rot=0,dy=0,dx=0;const left=side==='left';if(kind==='duck'){const flinch=sp(a,2.5,2.58,2.65,2.9);rot=(left?-5:9)*flinch;dy=(left?-7:12)*flinch}else if(kind==='party'){dy=8*sp(a,2.05,2.1,2.16,2.32);rot=(left?-3:4)*sp(a,4.6,4.9,6.2,6.7)}else{const panic=sp(a,4.25,4.36,4.48,4.85);rot=(left?-9:12)*panic;dy=(left?-18:16)*panic;dx=(left?-8:9)*panic}const puffAt=kind==='duck'?5.49:kind==='party'?5.63:5.65,puff=sp(a,puffAt,puffAt+.13,puffAt+.20,puffAt+.46);rot+=(left?-7:7)*puff;dy+=(left?-10:10)*puff;
- const tr=`translate(${f(dx)} ${f(dy)}) rotate(${f(rot)} ${left?330:730} ${left?700:1170})`;const withdraw=kind==='kitten'&&!left?se(a,2.05,2.65,'soft'):0;return{behind:`<g transform="${tr}"${withdraw>0?` opacity="${f(1-withdraw)}"`:""}>${h.behind}</g>`,front:`<g transform="${tr}"${withdraw>0?` opacity="${f(1-withdraw)}"`:""}>${h.front}</g>`}}
+ const tr=`translate(${f(dx)} ${f(dy)}) rotate(${f(rot)} ${left?330:730} ${left?700:1170})`;const withdraw=kind==='kitten'&&!left?se(a,1.60,2.05,'soft'):0;return{behind:`<g transform="${tr}"${withdraw>0?` opacity="${f(1-withdraw)}"`:""}>${h.behind}</g>`,front:`<g transform="${tr}"${withdraw>0?` opacity="${f(1-withdraw)}"`:""}>${h.front}</g>`}}
 function duckArt(a,headOnly=false){const impact=sp(a,2.52,2.57,2.62,2.78),settle=sp(a,2.79,2.9,2.94,3.08),blink=sp(a,4.05,4.13,4.16,4.23),tilt=-24*impact+13*settle-16*se(a,3.5,3.95)+22*se(a,4.35,4.95)-9*se(a,5.1,5.7);return `<g stroke="#2A2A2A" stroke-width="5" stroke-linecap="round" stroke-linejoin="round">${headOnly?'':`<path d="M-73 -8 Q-51 9 -35 -2 Q-2 -37 39 -15 Q79 1 72 33 Q64 61 13 67 Q-41 69 -61 43 Q-74 25 -73 -8Z" fill="#EDFF00"/><path d="M-48 21 Q-22 4 8 12 Q35 26 21 40 Q-9 55 -42 33" fill="#EDFF00"/><path d="M-42 21 Q-19 39 7 24" fill="none" stroke-width="4"/><path d="M-44 49 Q5 67 49 47" fill="none" opacity=".25"/>`}<g transform="translate(24 -15) rotate(${f(tilt)})"><path d="M-15 18 Q-36 0 -29 -28 Q-24 -60 6 -62 Q36 -64 42 -35 Q49 -6 20 20Z" fill="#EDFF00"/><path d="M30 -30 Q64 -33 70 -20 Q61 -8 35 -11Z" fill="#FF6941"/><path d="M39 -20 L64 -20" fill="none" stroke-width="3"/><path d="M10 -36c-3 -14 13 -16 14 -2c1 13 -13 15 -14 2Z" fill="#2A2A2A" transform="translate(0 ${f(-34*blink)}) scale(1 ${f(1-.92*blink)})" stroke="none"/><path d="M-12 -43 Q-2 -50 7 -48" stroke="#cccccc" opacity=".5" fill="none" stroke-width="6"/></g></g>`}
 function hatArt(a){const hit=sp(a,2.04,2.1,2.13,2.27),wobble=Math.sin((a-2.08)*13)*Math.exp(-Math.max(0,a-2.08)*3)*(a>2.08?1:0),tip=14*wobble;return `<g stroke="#2A2A2A" stroke-width="5" stroke-linejoin="round"><path d="M-84 3 Q-47 -62 ${f(-10+tip)} ${f(-159+18*hit)} Q${f(22+tip)} -105 82 1 Q7 26 -84 3Z" fill="#FF6941"/><path d="M-60 -39 Q-16 -29 54 -50 M-36 -89 Q-1 -77 22 -93" fill="none" stroke="#EDFF00" stroke-width="18"/><path d="M-57 -18 Q-40 -68 -14 -128" fill="none" stroke="#cccccc" opacity=".25" stroke-width="7"/><path d="M-84 3 Q0 28 82 1" fill="none" stroke="#EDFF00" stroke-width="14"/><path d="M${f(-10+tip)} ${f(-159+18*hit)}l-17 -7 9 -9 -4 -12 16 5 12 -8 2 13 13 5 -12 8 2 12Z" fill="#EDFF00"/></g>`}
-// Real feline walk: paws keep their world-space contacts while the trunk passes over them.
-// Last contacts are authored separately so stopping never drags all four feet into a pose.
-const KITTEN46={start:.45,stop:3.42,from:1260,to:720,scale:1.4,floor:1305};
-function kittenProgress(a){const u=clamp((a-KITTEN46.start)/(KITTEN46.stop-KITTEN46.start)),r=.13;return u<r?u*u/(2*r*(1-r)):u>1-r?1-(1-u)*(1-u)/(2*r*(1-r)):(u-r/2)/(1-r)}
-function kittenRoot(a){return (KITTEN46.from-KITTEN46.to)*(1-kittenProgress(a))/KITTEN46.scale}
-function kittenEase(u){u=clamp(u);return u*u*(3-2*u)}
-function kittenKeys(a,keys){let p=keys[0];for(let i=1;i<keys.length;i++){const q=keys[i];if(a<q[0]){const u=kittenEase((a-p[0])/(q[0]-p[0]));return p.slice(1).map((v,j)=>sg(v,q[j+1],u))}p=q}return p.slice(1)}
-function kittenFoot(a,front,near){
- // Lateral sequence: near hind, near fore, far hind, far fore (not paired diagonal trot).
- const phase=front?(near?.225:.675):(near?0:.45),first=1.15+phase,period=.9,swing=.27,rest=front?(near?-62:-53):(near?49:61),end=first+period*2;
- const target=t=>t>=end-.001?rest:kittenRoot(t)+rest-43;
- let prev=first-period*2,px=target(prev),x=px,y=near?0:-6,angle=0;
- for(let i=-1;i<3;i++){
-  const land=first+period*i,next=target(land);
-  if(a<land-swing)break;
-  if(a<land){const u=clamp((a-(land-swing))/swing),s=kittenEase(u);x=sg(px,next,s);y-=29*Math.sin(Math.PI*u);angle=38*Math.sin(Math.PI*u);return{x:x-kittenRoot(a),y,angle,contact:false}}
-  x=px=next;prev=land;
+// Restore the original cute character. The four run poses follow the supplied cat GIF.
+const KITTEN48={start:.65,stop:2.90,from:1180,to:660,scale:1.35,y:1280,floor:1389};
+function kittenProgress(a){const u=clamp((a-KITTEN48.start)/(KITTEN48.stop-KITTEN48.start)),r=.13;return u<r?u*u/(2*r*(1-r)):u>1-r?1-(1-u)*(1-u)/(2*r*(1-r)):(u-r/2)/(1-r)}
+function kittenKeys(a,keys){let p=keys[0];for(let i=1;i<keys.length;i++){const q=keys[i];if(a<q[0]){let u=clamp((a-p[0])/(q[0]-p[0]));u=u*u*(3-2*u);return p.slice(1).map((v,j)=>sg(v,q[j+1],u))}p=q}return p.slice(1)}
+function kittenGait(a){const cycle=kittenProgress(a)*3,v=cycle%1,active=1-se(a,2.77,3.10,'soft'),bob=kittenKeys(v,[[0,0],[.17,0],[.42,24],[.62,30],[.83,8],[.93,0],[1,0]])[0]*active;return{cycle,active,bob};}
+function kittenPaw(x,y,angle,color){return `<g transform="translate(${f(x)} ${f(y)}) rotate(${f(angle)})"><path d="M-6 -8 Q-14 -10 -19 -3 Q-24 4 -18 9 Q-13 13 -8 10 Q-3 13 2 10 Q12 12 12 4 Q11 -5 6 -9Z" fill="${color}" stroke="#2A2A2A" stroke-width="3"/><path d="M-13 3l-1 5m8 -4v5" fill="none" stroke="#2A2A2A" stroke-width="1.8"/></g>`;}
+function kittenFoot(a,front,near,gait){
+ const v=(gait.cycle+(near?0:.045))%1,stride=(KITTEN48.from-KITTEN48.to)/(3*KITTEN48.scale);let x,y,angle;
+ if(front){
+  if(v>=.88||v<.16){const z=v>=.88?v-.88:v+.12;x=-36+stride*(z-.12);y=74+gait.bob;angle=0;}
+  else [x,y,angle]=kittenKeys(v,[[.16,-31,74,0],[.34,-65,45,15],[.58,-14,38,-35],[.76,-54,49,22],[.88,-36-stride*.12,74+gait.bob,0]]);
+ }else{
+  if(v>=.04&&v<.30){x=25+stride*(v-.04);y=74+gait.bob;angle=0;}
+  else [x,y,angle]=kittenKeys(v,[[0,40,74,0],[.04,25,74+gait.bob,0],[.30,25+stride*.26,74,0],[.45,66,40,-22],[.66,16,46,30],[.88,35,64,10],[1,40,74,0]]);
  }
- return{x:x-kittenRoot(a),y,angle,contact:true};
+ return{x:sg(front?-36:40,x,gait.active),y:sg(74,y,gait.active),angle:angle*gait.active};
 }
-// Two rigid limb segments; elbow direction differs from the cat's backward-pointing hock.
-function kittenJoint(root,tip,l1,l2,bend){const dx=tip.x-root.x,dy=tip.y-root.y,d=Math.min(l1+l2-.01,Math.max(.01,Math.hypot(dx,dy))),along=(l1*l1-l2*l2+d*d)/(2*d),side=Math.sqrt(Math.max(0,l1*l1-along*along))*bend,n=Math.hypot(dx,dy)||1;return{x:root.x+dx/n*along-dy/n*side,y:root.y+dy/n*along+dx/n*side}}
-function kittenPaw(x,y,angle,color,spread=0){return `<g transform="translate(${f(x)} ${f(y)}) rotate(${f(angle)})"><path d="M5 -11Q-1 -12 -5 -7Q-17 -6 -18 0Q-18 5 -10 5L7 5Q12 4 10 -2Z" fill="${color}" stroke="#2A2A2A" stroke-width="3"/><path d="M-11 0v3m6 -3v3" stroke="#2A2A2A" stroke-width="1.6" fill="none"/>${spread>.01?`<path d="M-16 -1l${f(-5*spread)} -4m6 3l${f(-4*spread)} -6m7 5l${f(-2*spread)} -7" stroke="#cccccc" stroke-width="2" fill="none"/>`:''}</g>`}
-function kittenState(a){
- const moving=1-se(a,3.18,3.65,'soft'),phase=(a-1.1)/.9*Math.PI*2,rest=se(a,5.65,6.55,'soft'),alert=sp(a,8.02,8.24,8.72,9.04);
- // Head and trunk stay supported during the paw action. Only a small preparatory weight transfer.
- const load=sp(a,3.72,3.97,4.47,4.85),shift=4*load,breath=1.1*Math.sin(a*2.1)*(1-moving);
- const shoulder={x:-55+shift+4*Math.sin(phase-.4)*moving,y:-107+3*rest+4*Math.sin(phase)*moving+breath},hip={x:55+3*Math.sin(phase+1.2)*moving,y:-96+2*rest+2.6*Math.sin(phase+1.3)*moving+breath};
- const look=se(a,3.08,3.75,'soft'),head={x:shoulder.x-37-5*look,y:-145-6*look+2*rest+breath,angle:12*look-8*rest+5*alert};
- return{moving,phase,rest,alert,load,shoulder,hip,head};
-}
-function kittenCurve(u,p0,p1,p2,p3){u=clamp(u);const v=1-u;return{x:v*v*v*p0[0]+3*v*v*u*p1[0]+3*v*u*u*p2[0]+u*u*u*p3[0],y:v*v*v*p0[1]+3*v*v*u*p1[1]+3*v*u*u*p2[1]+u*u*u*p3[1]}}
-function kittenStrike(a){
- let p,angle,spread=0;
- if(a<4.10){const u=kittenEase((a-3.76)/.34);p=kittenCurve(u,[-62,-7],[-59,-47],[-53,-112],[-86,-139]);angle=-105*u}
- else if(a<4.21){p={x:-86,y:-139};angle=-105}
- else if(a<4.36){const u=se(a,4.21,4.36,'fast');p=kittenCurve(u,[-86,-139],[-95,-176],[-125,-177],[-142,-150]);const flick=kittenEase((u-.63)/.32);angle=sg(-105,28,flick);spread=flick}
- else if(a<4.58){const u=se(a,4.36,4.58,'fast');p=kittenCurve(u,[-142,-150],[-126,-164],[-61,-139],[-79,-121]);angle=sg(28,-100,kittenEase(u));spread=1-clamp(u*3)}
- else{const u=kittenEase((a-4.58)/.36);p=kittenCurve(u,[-79,-121],[-66,-99],[-50,-39],[-62,-7]);angle=-100*(1-u)}
- return{...p,angle,spread};
-}
-function kittenLeg(a,front,near,s){
- const color=near?'#FF6941':'#b3452b',foot=kittenFoot(a,front,near),root=front?{x:s.shoulder.x+(near?0:8),y:s.shoulder.y+12}:{x:s.hip.x+(near?0:8),y:s.hip.y+4};
- let tip={x:foot.x,y:foot.y-7},angle=foot.angle,spread=0;
- if(front&&near&&a>=3.76){
-  // Lift compactly, hold the flexed wrist, flick across the target, then fold back to the chest.
-  const q=kittenStrike(a);tip={x:q.x,y:q.y};angle=q.angle;spread=q.spread;
- }
- let path;
- if(front){const elbow=kittenJoint(root,tip,44,65,-1);path=`M${f(root.x)} ${f(root.y)}Q${f(root.x+10)} ${f(root.y+24)} ${f(elbow.x)} ${f(elbow.y)}L${f(tip.x)} ${f(tip.y)}`}
- else{const hock={x:tip.x+15,y:tip.y-24},knee=kittenJoint(root,hock,41,42,1);path=`M${f(root.x)} ${f(root.y)}Q${f(knee.x)} ${f(knee.y-5)} ${f(knee.x)} ${f(knee.y)}L${f(hock.x)} ${f(hock.y)}L${f(tip.x)} ${f(tip.y)}`}
- return `<g data-cat-limb="${near?'near':'far'}-${front?'fore':'hind'}" stroke-linecap="round" stroke-linejoin="round"><path d="${path}" fill="none" stroke="#2A2A2A" stroke-width="${front?18:23}"/><path d="${path}" fill="none" stroke="${color}" stroke-width="${front?12:17}"/>${kittenPaw(tip.x,tip.y+5,angle,color,spread)}</g>`;
-}
+function kittenSwat(a){return kittenKeys(a,[[3.70,-36,74,0,-45,51],[3.96,-49,5,-72,-47,30],[4.19,-55,-9,-98,-49,18],[4.34,-77,-28,20,-60,5],[4.43,-70,-20,0,-55,8],[4.60,-48,8,-68,-46,30],[4.92,-36,74,0,-44,52]]);}
 function kittenArt(a){
- const s=kittenState(a),{shoulder:b,hip:h,head,rest,alert,load}=s,ink='#2A2A2A';
- const tail=kittenKeys(a,[[1.1,126,-153,142,-206,118,-204],[3.55,123,-151,135,-196,116,-198],[4.02,138,-133,155,-170,142,-186],[4.38,143,-128,159,-163,140,-180],[4.9,119,-147,137,-194,117,-197],[5.65,114,-137,142,-155,128,-167],[6.55,130,-125,155,-174,133,-180],[8.1,130,-125,155,-174,133,-180],[8.35,125,-129,152,-184,124,-186],[8.8,130,-125,155,-174,133,-180]]),tailSway=3*Math.sin(s.phase*.5)*s.moving;
- const tailPath=`M${f(h.x+28)} ${f(h.y-4)}C${f(tail[0])} ${f(tail[1])} ${f(tail[2]+tailSway)} ${f(tail[3])} ${f(tail[4]+tailSway)} ${f(tail[5])}`;
- const body=`M${f(b.x-12)} ${f(b.y-15)}C${f(b.x+16)} ${f(b.y-32)} ${f(h.x-30)} ${f(h.y-31)} ${f(h.x+8)} ${f(h.y-22)}C${f(h.x+47)} ${f(h.y-18)} ${f(h.x+48)} ${f(h.y+25)} ${f(h.x+20)} ${f(h.y+42)}C${f(h.x-10)} ${f(h.y+44)} ${f(b.x+31)} ${f(b.y+55)} ${f(b.x-2)} ${f(b.y+43)}Q${f(b.x-26)} ${f(b.y+25)} ${f(b.x-12)} ${f(b.y-15)}Z`;
- const blink=sp(a,2.37,2.43,2.47,2.54)+sp(a,5.25,5.33,5.4,5.53),eye=1-.90*blink-.78*rest*(1-alert),hiss=sp(a,3.92,4.10,4.83,5.25),meow=Math.max(sp(a,3.45,3.55,3.98,4.15),sp(a,6.38,6.50,7.80,8.12),.85*hiss),ear=sp(a,3.77,3.96,4.83,5.25);
- let out=`<g stroke="${ink}" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">${kittenLeg(a,false,false,s)}${kittenLeg(a,true,false,s)}<path d="${tailPath}" fill="none" stroke="${ink}" stroke-width="20"/><path d="${tailPath}" fill="none" stroke="#FF6941" stroke-width="13"/><path d="${body}" fill="#FF6941"/>`;
- // The near haunch and scapula make the leg roots part of the cat, not dangling sticks.
- out+=kittenLeg(a,false,true,s)+`<path d="M${f(h.x-8)} ${f(h.y-17)}Q${f(h.x+30)} ${f(h.y-16)} ${f(h.x+32)} ${f(h.y+11)}Q${f(h.x+31)} ${f(h.y+27)} ${f(h.x+14)} ${f(h.y+35)}" fill="#FF6941" stroke-width="3"/>`;
- out+=(a>=3.76&&a<4.94?'':kittenLeg(a,true,true,s))+`<path d="M${f(b.x-13)} ${f(b.y-20)}Q${f(b.x+7)} ${f(b.y-25)} ${f(b.x+14)} ${f(b.y-3)}L${f(b.x+7)} ${f(b.y+17)}" fill="#FF6941" stroke="none"/><path d="M-3 ${f(b.y-21)}l-2 15m22 -16l-4 17m22 -13l-4 14" fill="none" stroke-width="6" opacity=".42"/>`;
- out+=`<path d="M${f(b.x+5)} ${f(b.y-15)}Q${f(b.x-3)} ${f(b.y-49)} ${f(head.x+12)} ${f(head.y+4)}L${f(head.x+16)} ${f(head.y+27)}Q${f(b.x-32)} ${f(b.y+17)} ${f(b.x-10)} ${f(b.y+26)}Z" fill="#FF6941" stroke="none"/><g transform="translate(${f(head.x)} ${f(head.y)}) rotate(${f(head.angle)})"><path d="M-24 -16L${f(-29-5*ear)} ${f(-49+12*ear)}Q-9 -43 -2 -28Q12 -32 22 -22L${f(40+6*ear)} ${f(-42+13*ear)}L35 -7Q42 15 18 29Q-7 39 -25 24L-42 17Q-54 12 -43 1L-34 -1Z" fill="#FF6941"/><path d="M-23 -35l14 10m39 -5l-6 12" stroke="#EDFF00" stroke-width="6"/>
- <path d="M-27 -20l8 9m0 -12l5 10" stroke-width="4" opacity=".5"/>
- <g transform="translate(-18 -3) scale(1 ${f(Math.max(.08,eye))})"><path d="M-14 0Q-3 -15 11 -3Q1 10 -14 0Z" fill="#EDFF00" stroke-width="3"/><ellipse cx="-5" cy="-1" rx="3.5" ry="8" fill="${ink}" stroke="none"/><circle cx="-6" cy="-4" r="1.8" fill="#cccccc" stroke="none"/></g><path d="M-34 -3q-5 2 -6 5" fill="none" stroke-width="3"/>
- <path d="M-42 1l-6 7 8 3 3 -7Z" fill="${ink}" stroke="none"/><path d="M-39 11q4 9 13 6" fill="none" stroke-width="2.5"/><path d="M-39 15Q-34 ${f(17+13*meow)} -25 18" fill="${ink}" stroke-width="${f(2+4*meow)}"/>
- <path d="M-30 12l-28 -5m29 12l-29 3m37 -5l-3 12" fill="none" stroke-width="2.5"/><path d="M15 3q11 9 5 19" fill="none" opacity=".35" stroke-width="3"/></g>`;
- if(a>=3.76&&a<4.94)out+=kittenLeg(a,true,true,s);
- return out+'</g>';
+ const gait=kittenGait(a),walk=gait.active,phase=gait.cycle*Math.PI*2,curl=se(a,6.2,7.6,'soft'),swat=sp(a,4.20,4.34,4.43,4.65),cock=sp(a,3.70,3.96,4.19,4.34),headTilt=-13*se(a,2.85,3.5)+10*se(a,5.15,5.65)+18*curl+3*Math.sin(phase)*walk-8*swat,blink=sp(a,3.20,3.26,3.30,3.38),hiss=sp(a,3.92,4.10,4.83,5.25),meow=Math.max(sp(a,3.45,3.55,3.98,4.15),sp(a,6.38,6.50,7.80,8.12),.85*hiss);let backLegs='',frontLegs='',raisedPaw='';
+ for(let i=0;i<4;i++){
+  const near=i>=2,front=i%2===0,x=front?-36:40,y=front?18:(near?40:33),foot=kittenFoot(a,front,near,gait);
+  let footX=sg(foot.x,front?-25:34,curl),footY=sg(foot.y,49,curl),angle=foot.angle,kneeX=x+(front?-8:18)+(footX-x)*.35,kneeY=sg(51,footY-17,.55);
+  const raised=front&&near&&a>=3.70&&a<4.92;
+  if(raised)[footX,footY,angle,kneeX,kneeY]=kittenSwat(a);
+  const color=near?'#FF6941':'#b3452b';
+  const leg=`<g fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M${x} ${y-5} Q${f(kneeX)} ${f(kneeY)} ${f(footX)} ${f(footY-2)}" stroke="#2A2A2A" stroke-width="17"/><path d="M${x} ${y-5} Q${f(kneeX)} ${f(kneeY)} ${f(footX)} ${f(footY-2)}" stroke="${color}" stroke-width="11"/></g>${kittenPaw(footX,footY,angle,color)}`;
+  if(raised)raisedPaw=leg;else if(near)frontLegs+=leg;else backLegs+=leg;
+ }
+ const air=gait.bob/24,land=sp(a,2.82,2.91,2.97,3.14)+.45*sp(a,4.59,4.75,4.82,5.02);
+ const tailAngle=18*Math.sin(phase*.4)*walk+14*Math.sin((a-2.8)*2.8)*(1-walk)*(1-curl)+17*se(a,3.78,4.35)+18*sp(a,8.15,8.45,8.55,8.9),tailCurl=85*curl,ear=10*sp(a,3.92,4.10,4.83,5.25)-8*sp(a,6.42,6.62,6.85,7.15),wake=sp(a,8.3,8.57,8.70,9.1);
+ return `<g transform="translate(0 68) scale(${f(1+.07*land)} ${f(1-.08*land)}) translate(0 -68)" stroke="#2A2A2A" stroke-width="5" stroke-linecap="round" stroke-linejoin="round">${backLegs}${frontLegs}<path d="M42 28 C${f(103-tailCurl*.2)} ${f(11-tailAngle)} ${f(83-tailCurl)} ${f(-76+tailCurl)} ${f(61-tailCurl)} ${f(-60+tailCurl)}" fill="none" stroke="#2A2A2A" stroke-width="23"/><path d="M42 28 C${f(103-tailCurl*.2)} ${f(11-tailAngle)} ${f(83-tailCurl)} ${f(-76+tailCurl)} ${f(61-tailCurl)} ${f(-60+tailCurl)}" fill="none" stroke="#FF6941" stroke-width="15"/>
+ <path d="M-52 30 Q${f(-59+8*curl)} ${f(-3-10*curl)} -21 ${f(-14-7*curl)} Q14 ${f(-25-10*curl)} 42 ${f(-3-9*curl)} Q${f(66+10*curl)} 12 ${f(61+8*curl)} 37 Q31 ${f(65-3*curl)} -17 54 Q-47 52 -52 30Z" fill="#FF6941"/><path d="M27 -5l-3 16m20 -7l-2 16" fill="none" opacity=".4" stroke-width="7"/>
+ <g transform="translate(${f(-8-18*curl-24*walk)} ${f(-20+40*curl)}) rotate(${f(headTilt)})"><path d="M-43 -1 Q-48 -10 ${f(-50-ear*.3)} ${f(-50+ear*.5)} L-16 -34 Q6 -42 24 -28 L${f(51+ear*.3)} ${f(-46+ear)} Q52 -18 47 -2 Q49 39 0 43 Q-42 39 -43 -1Z" fill="#FF6941"/><path d="M-40 -34 L-25 -24 M40 -31 L28 -22" stroke="#EDFF00" stroke-width="7"/>
+ <path d="M-7 -28l-1 11m13 -10l-2 11" stroke-width="6" opacity=".5"/>
+ ${[-1,1].map(side=>`<g transform="translate(${side*21} 4)"><path d="M-10 0 C-12 -18 11 -20 12 -2 C13 18 -10 17 -10 0Z" fill="#2A2A2A" transform="scale(1 ${f((1-.94*curl+.55*curl*wake)*(1-.9*blink))})"/><path d="M-3 -6l3 -3" stroke="#cccccc" stroke-width="4" opacity="${f(1-curl)}"/></g>`).join('')}
+ <path d="M-7 19Q0 15 8 19L1 26Z" fill="#2A2A2A"/><path d="M1 26q-2 10 -12 4m12 -4q3 9 12 2" fill="none" stroke-width="3"/><path d="M-5 28Q1 ${f(25+20*meow)} 8 28" fill="#2A2A2A" stroke-width="${f(3+8*meow)}"/>
+ <path d="M-34 16l-27 -6m29 14l-29 3m94 -10l25 -8m-24 17l28 2" fill="none" stroke-width="3"/></g><path d="M60 35 Q${f(70-10*curl)} ${f(43+20*curl)} ${f(34-48*curl)} ${f(48+7*curl)} Q${f(10-48*curl)} ${f(50-4*curl)} ${f(4-53*curl)} ${f(40-8*curl)}" fill="none" opacity="${f(curl)}" stroke-width="22" stroke="#2A2A2A"/><path d="M60 35 Q${f(70-10*curl)} ${f(43+20*curl)} ${f(34-48*curl)} ${f(48+7*curl)} Q${f(10-48*curl)} ${f(50-4*curl)} ${f(4-53*curl)} ${f(40-8*curl)}" fill="none" opacity="${f(curl)}" stroke-width="14" stroke="#FF6941"/>${raisedPaw}</g>`;
 }
 function surpriseScene(t){const p=interaction.surprisePlan;if(!p)return '';const a=surpriseAge(t),fade=1-se(a,10.05,10.65,'soft');let out='';
  if(p.kind==='duck'){
@@ -152,7 +120,7 @@ function surpriseScene(t){const p=interaction.surprisePlan;if(!p)return '';const
   if(a>=2.88&&a<5.7){const unroll=se(a,2.88,3.02),limp=se(a,3.45,4.1,'soft'),disappear=se(a,5.35,5.7),len=145*unroll*(1-.6*disappear),sag=70*limp;out+=`<g opacity="${f(1-disappear)}" transform="translate(530 1045)"><path d="M0 0Q${f(len*.5)} ${f(-8+sag*.2)} ${f(len)} ${f(6+sag)}" fill="none" stroke="#2A2A2A" stroke-width="20"/><path d="M0 0Q${f(len*.5)} ${f(-8+sag*.2)} ${f(len)} ${f(6+sag)}" fill="none" stroke="#FF6941" stroke-width="14"/><path d="M${f(len)} ${f(6+sag)}q24 -12 14 -28q-20 -8 -18 10" fill="none" stroke="#EDFF00" stroke-width="9"/></g>`}
   for(let i=0;i<16;i++){const b=a-2.94-i*.025;if(b<0||b>2.9)continue;const x=530+Math.sin(i*2.6)*170*b/(1+b*.5)+Math.sin(b*4+i)*13,y=780-180*b+135*b*b;out+=`<path d="M-5 -10l10 3 2 17 -11 -3Z" fill="${i%2?'#FF6941':'#EDFF00'}" opacity="${f(1-se(b,2.1,2.9,'soft'))}" transform="translate(${f(x)} ${f(y)}) rotate(${f(i*47+b*140)}) scale(${f(.2+.8*Math.abs(Math.cos(b*8+i)))} 1)"/>`}
  }else{
-  if(a>=KITTEN46.start){const x=KITTEN46.to+KITTEN46.scale*kittenRoot(a);out+=`<ellipse cx="${f(x)}" cy="${KITTEN46.floor+8}" rx="140" ry="9" fill="#2A2A2A" opacity=".17"/><g data-cat-rig="46" transform="translate(${f(x)} ${KITTEN46.floor}) scale(${KITTEN46.scale})">${kittenArt(a)}</g>`}
+  if(a>=KITTEN48.start){const gait=kittenGait(a),rise=sp(a,3.86,4.20,4.43,4.76),x=sg(KITTEN48.from,KITTEN48.to,kittenProgress(a)),y=KITTEN48.y-KITTEN48.scale*gait.bob-20*rise+15*se(a,6.2,7.6,'soft');out+=`<ellipse cx="${f(x)}" cy="${KITTEN48.floor}" rx="${f(78-12*gait.bob/30)}" ry="8" fill="#2A2A2A" opacity=".17"/><g data-cat-rig="48" transform="translate(${f(x)} ${f(y)}) scale(${KITTEN48.scale})">${kittenArt(a)}</g>`}
   const peek=sp(a,8.0,8.23,8.73,8.84);if(peek>0)out+=`<g clip-path="url(#letterWindows)"><g transform="translate(0 ${f(85*(1-peek))})"><rect x="330" y="877" width="350" height="115" fill="#EDFF00"/><path d="M395 938q-5 -10 4 -11q10 2 3 12Z M619 946q-4 -8 3 -10q8 1 3 10Z" fill="#2A2A2A"/></g></g>`;
  }
  // Keep prop details distinct when the character palette changes.
